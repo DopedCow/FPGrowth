@@ -1,11 +1,19 @@
 # ------------------------------------------------------------------------------
 # F R E Q U E N T   P A T T E R N   A N A L Y S I S
 #
-# Using apriori, eclat or fp growth
+# Using FP Growth
+#
+# Watch https://www.youtube.com/watch?v=VB8KWm8MXss for a walk-through of the
+# algorithm and https://www.youtube.com/watch?v=ToswH_dA7KU for a walk-through
+# of how to mine the rules.
 #
 # TODO Research which packages exist and still have active support
 # TODO Implement minimal memory management where needed by assigning objects to
 #      nothing and running the garbage collector – gc().
+# TODO Make it possible to select restrictions when building the FP tree - e.g.
+#      provide a minimum support level required. This will knock out items
+#      early in the process and save subsequent calculations, but also put a
+#      limit on the rules that can be mined afterwards.
 # ------------------------------------------------------------------------------
 
 
@@ -15,6 +23,39 @@ using CSV
 using DataFrames
 using Statistics
 
+
+
+# Define structures ------------------------------------------------------------
+# Building on the code from:
+# https://stackoverflow.com/questions/36593490/tree-data-structure-in-julia
+
+mutable struct TreeNode
+    parent::Int
+    children::Vector{Int}
+
+    # item_id allows two nodes to represent the same item at different locations
+    item_id::Int
+    item_label::String
+    count::Int
+end
+
+struct Tree
+    nodes::Vector{TreeNode}
+end
+
+Tree() = Tree([TreeNode(0, Vector{Int}())])
+
+function addchild(tree::Tree, id::Int)
+    1 <= id <= length(tree.nodes) || throw(BoundsError(tree, id))
+    push!(tree.nodes, TreeNode(id, Vector{}()))
+    child = length(tree.nodes)
+    push!(tree.nodes[id].children, child)
+    child
+end
+
+children(tree, id) = tree.nodes[id].children
+
+parent(tree,id) = tree.nodes[id].parent
 
 
 # ------------------------------------------------------------------------------
@@ -202,21 +243,21 @@ function add_sub_tree!(tree::Tree, id::Int, itemset::Vector{Int})
     end
 end
 
-fp_tree.nodes.item_id
-
-current_node = fp_tree.nodes[1]
-append!(current_node.children, 16)
-current_node.children
-
-push!(fp_tree.nodes, TreeNode(1, Vector{Int}(), 16, "inner", 1))
-
-[fp_tree.nodes[i].item_id .== 16 for i = 1:2]
-
-(fp->fp_tree.nodes).(1:2)
-
-getfield.(fp_tree.nodes, item_id)
-
-dump(fp_tree)
+# fp_tree.nodes.item_id
+#
+# current_node = fp_tree.nodes[1]
+# append!(current_node.children, 16)
+# current_node.children
+#
+# push!(fp_tree.nodes, TreeNode(1, Vector{Int}(), 16, "inner", 1))
+#
+# [fp_tree.nodes[i].item_id .== 16 for i = 1:2]
+#
+# (fp->fp_tree.nodes).(1:2)
+#
+# getfield.(fp_tree.nodes, item_id)
+#
+# dump(fp_tree)
 
 
 
@@ -283,37 +324,3 @@ function query_rules(df, support, confidence, lift)
     # lift: rules
     return rules
 end
-
-
-
-# ------------------------------------------------------------------------------
-# C o d e   s n i p p e t s
-# ------------------------------------------------------------------------------
-
-# From https://stackoverflow.com/questions/36593490/tree-data-structure-in-julia
-
-mutable struct TreeNode
-    parent::Int
-    children::Vector{Int}
-    item_id::Int
-    item_label::String
-    count::Int
-end
-
-struct Tree
-    nodes::Vector{TreeNode}
-end
-
-Tree() = Tree([TreeNode(0, Vector{Int}())])
-
-function addchild(tree::Tree, id::Int)
-    1 <= id <= length(tree.nodes) || throw(BoundsError(tree, id))
-    push!(tree.nodes, TreeNode(id, Vector{}()))
-    child = length(tree.nodes)
-    push!(tree.nodes[id].children, child)
-    child
-end
-
-children(tree, id) = tree.nodes[id].children
-
-parent(tree,id) = tree.nodes[id].parent
