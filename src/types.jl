@@ -77,7 +77,7 @@ function insert_node(tree::Tree, label::String, parent::Int)
     id = tree.size
     push!(tree.nodes, Node(id = id, label = label, parent = parent))
     push!(tree.labels, label)
-    @info "Added node number $id with the label $label" "Updated .labels on tree"
+    @info "Added node number $id with the label $label"
 end
 
 
@@ -87,6 +87,7 @@ end
 Increases the support count of the supplied node by 1.
 """
 update_node!(node::Node) = node.support += 1
+
 
 """
     test_functionality()
@@ -133,13 +134,5 @@ function test_build()
 
 end
 
-function teste(x)
-    @info "x = $x"
-end
-
-with_logger(logger) do
-    teste(1)
-    teste([1,2])
-end
 
 end # module
