@@ -1,12 +1,16 @@
 # FPGrowth
 
+> **Please note!** This Markdown document uses both math syntax and mermaid diagrams, so it will not render correctly on GitHub. Have look at the PDF file instead.
+
 Julia implementation of the FP Growth algorithm from Han, Pei and Yin: [Mining Frequent Patterns without Candidate Generation](https://www.cs.sfu.ca/~jpei/publications/sigmod00.pdf).
 
 Watch [Chapter-7 : FP Growth method with an example](https://www.youtube.com/watch?v=VB8KWm8MXss) for a walk-through of the algorithm and [Chapter-9 : Association rule mining with FP Growth method](https://www.youtube.com/watch?v=ToswH_dA7KU) for a walk-through of how to mine the rules.
 
+## Introduction to FP Growth
+
 We need two algorithms for FP Growth. One to build the tree and another to mine the rules.
 
-**Build the tree**
+### Build the tree
 
 ```mermaid
 flowchart TD
@@ -61,9 +65,7 @@ The nodes in the tree all have the same information: *Label*, *count* and *node-
 
 This setup would suggest having one set of functions that read, convert and transform the transactions and another that builds the tree and the table (stored on the tree).
 
-
-
-**Mine the rules**
+### Mine the rules
 
 ```mermaid
 flowchart TD
@@ -83,4 +85,12 @@ Use this link to get the powerset in julia: [all subset of a se in julia - Stack
 
 ## Notation
 
-$\xi$ – minimum support threshold
+Throughout this document the following notation is used.
+
+| symbol        | meaning                   | notes                                                                                                                                                                                                                                                                 |
+| -------------:| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| $\xi$         | minimum support threshold | The notation was chosen to reflect the notation in the orignal paper.                                                                                                                                                                                                 |
+| $\varnothing$ | empty set                 | { }                                                                                                                                                                                                                                                                   |
+| $\mathcal{P}$ | powerset                  | $\mathcal{P}(T)$ denotes the power set of $T$. E.g. the power set of $\mathcal{P}(\{1,2,3\}) = \{\ \varnothing, \{1\}, \{2\}, \{3\}, \{1, 2\}, \{1,3\}, \{2,3\}, \{1,2,3\}\}$. We will use this for the discovery of rules when we move from leaf nodes to root node. |
+|               |                           |                                                                                                                                                                                                                                                                       |
+|               |                           |                                                                                                                                                                                                                                                                       |
